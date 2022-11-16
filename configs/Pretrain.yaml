@@ -1,0 +1,37 @@
+train_file: [
+    '/mnt/sda/lpf/data/medical/medical_image_caption/medicat/medicat_full.json',     # 320890
+    '/mnt/sda/lpf/data/medical/medical_image_caption/clef2022/clef2022_train.json',   # 83275
+    '/mnt/sda/lpf/data/medical/medical_image_caption/clef2022/clef2022_val.json',     # 7645
+    '/mnt/sda/lpf/data/medical/medical_image_caption/roco/roco_train.json',           # 65450 - 65419
+    '/mnt/sda/lpf/data/medical/medical_image_caption/roco/roco_val.json',             # 8180 - 8175
+    '/mnt/sda/lpf/data/medical/medical_image_caption/roco/roco_test.json',            # 8179 - 8176
+    '/mnt/sda/lpf/data/medical/medical_image_caption/mimic_cxr/mimic_cxr_train.json',  # 89395
+    '/mnt/sda/lpf/data/medical/medical_image_caption/mimic_cxr/mimic_cxr_val.json',    # 759
+    '/mnt/sda/lpf/data/medical/medical_image_caption/mimic_cxr/mimic_cxr_test.json',   # 1531
+]
+# each train_file (json) contains a python list where each item is {'image': img_path, 'caption': text or list_of_text }
+
+image_root: '/mnt/sda/lpf/data/medical/medical_image_caption/'
+
+bert_config: 'configs/config_bert.json'
+vit_mae_pretrain_path: '/mnt/sda/lpf/weights/pre_training/mae_pretrain_vit_base.pth'
+
+image_res: 256
+vision_width: 768
+embed_dim: 256  # 193 # 129 # 256
+batch_size: 16
+temp: 0.07
+mlm_probability: 0.15
+queue_size: 65536
+momentum: 0.995
+alpha: 0.4
+
+optimizer: {opt: adamW, lr: 1e-4, weight_decay: 0.02}
+schedular: {sched: cosine, lr: 1e-4, epochs: 30, min_lr: 1e-5, decay_rate: 1, warmup_lr: 1e-5, warmup_epochs: 20, cooldown_epochs: 0}
+
+
+
+
+
+
+
