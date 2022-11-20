@@ -1,16 +1,11 @@
 train_file: ['/mnt/sda/lpf/data/vqa/data_Slake/en/slake_train.json',
              '/mnt/sda/lpf/data/vqa/data_Slake/en/slake_val.json']
-
 test_file: ['/mnt/sda/lpf/data/vqa/data_Slake/en/slake_test.json']
-
-answer_list: '/mnt/sda/lpf/data/vqa/data_Slake/en/answer_trainval_list.json'  # 231候选答案
-#answer_list: '/mnt/sda/lpf/data/vqa/data_Slake/en/answer_all_list.json'      # 233候选答案
-
-
-vqa_root: '/mnt/sda/lpf/data/vqa/data_Slake/imgs/'  # slake
+answer_list: '/mnt/sda/lpf/data/vqa/data_Slake/en/answer_trainval_list.json'
+vqa_root: '/mnt/sda/lpf/data/vqa/data_Slake/imgs/'
 
 image_res: 384
-batch_size_train: 8  # 32
+batch_size_train: 8
 batch_size_test: 4
 k_test: 128
 
@@ -24,10 +19,3 @@ bert_config: 'configs/config_bert.json'
 
 optimizer: {opt: adamW, lr: 2e-5, weight_decay: 0.02}
 schedular: {sched: cosine, lr: 2e-5, epochs: 40, min_lr: 1e-6, decay_rate: 1, warmup_lr: 1e-5, warmup_epochs: 4, cooldown_epochs: 0}
-
-
-
-
-
-
-

@@ -1,27 +1,11 @@
-'''
- * Copyright (c) 2021, salesforce.com, inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
-'''
-
 import argparse
 import os
 import ruamel_yaml as yaml
-# import yaml
-import numpy as np
-import random
 import time
 import datetime
 import json
 from pathlib import Path
-
-
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import DataLoader
-import torch.backends.cudnn as cudnn
 import torch.distributed as dist
 
 from models.model_pretrain import M2I2
@@ -32,7 +16,6 @@ import utils
 from dataset import create_dataset, create_sampler, create_loader
 from scheduler import create_scheduler
 from optim import create_optimizer
-import tools.common_utils as common_utils
 
 
 def train(model, data_loader, optimizer, tokenizer, epoch, warmup_steps, device, scheduler, config):
@@ -90,15 +73,6 @@ def train(model, data_loader, optimizer, tokenizer, epoch, warmup_steps, device,
     return {k: "{:.3f}".format(meter.global_avg) for k, meter in metric_logger.meters.items()}
 
 
-# 设置随机种子
-def set_seed(seed: int):
-    torch.manual_seed(seed)
-    np.random.seed(seed)
-    random.seed(seed)
-    cudnn.benchmark = True
-    print("Set Random Seed: ", seed)
-
-
 def main(args, config):
     utils.init_distributed_mode(args)
 
@@ -106,7 +80,7 @@ def main(args, config):
 
     # fix the seed for reproducibility
     seed = args.seed + utils.get_rank()
-    set_seed(seed)
+    utils.set_seed(seed)
 
     start_epoch = 0
     max_epoch = config['schedular']['epochs']
@@ -197,12 +171,10 @@ def main(args, config):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', default='./configs/Pretrain.yaml')
-    parser.add_argument('--checkpoint', default='/mnt/sda/lpf/weights/pre_training/albef/ALBEF.pth')  #
+    parser.add_argument('--checkpoint', default='')
     parser.add_argument('--resume', default=False, type=bool)
     parser.add_argument('--output_dir', default='/mnt/sda/lpf/weights/output/M2I2/pretrain')
-    parser.add_argument('--text_encoder', default='bert-base-uncased')  # 原生BERT
-    # parser.add_argument('--text_encoder', default='microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext')  # PubMedBERT
-    # parser.add_argument('--text_encoder', default='microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract')  # PubMedBERT
+    parser.add_argument('--text_encoder', default='bert-base-uncased')
     parser.add_argument('--device', default='cuda')
     parser.add_argument('--seed', default=42, type=int)
     parser.add_argument('--world_size', default=1, type=int, help='number of distributed processes')
@@ -213,7 +185,7 @@ if __name__ == '__main__':
     config = yaml.safe_load(open(args.config, 'r'))
 
     args.output_dir = os.path.join(args.output_dir, datetime.date.today().strftime('%Y-%m-%d'))
-    common_utils.make_dirs(args.output_dir)
+    Path(args.output_dir).mkdir(parents=True, exist_ok=True)
 
     yaml.dump(config, open(os.path.join(args.output_dir, 'config.yaml'), 'w'))
     yaml.dump(args.__dict__, open(os.path.join(args.output_dir, 'args.yaml'), 'w'))

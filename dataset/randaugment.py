@@ -85,16 +85,7 @@ def solarize_func(img, thresh=128):
 
 
 def color_func(img, factor):
-    '''
-        same output as PIL.ImageEnhance.Color
-    '''
-    ## implementation according to PIL definition, quite slow
-    #  degenerate = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)[:, :, np.newaxis]
-    #  out = blend(degenerate, img, factor)
-    #  M = (
-    #      np.eye(3) * factor
-    #      + np.float32([0.114, 0.587, 0.299]).reshape(3, 1) * (1. - factor)
-    #  )[np.newaxis, np.newaxis, :]
+
     M = (
             np.float32([
                 [0.886, -0.114, -0.114],

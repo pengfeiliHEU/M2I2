@@ -91,8 +91,8 @@ class VQAEval:
     def evaluate(self, quesIds=None):
         if quesIds == None:
             quesIds = [quesId for quesId in self.params['question_id']]
-        gts = {}  # 真实答案数据
-        res = {}  # 预测答案数据
+        gts = {}
+        res = {}
         for quesId in quesIds:
             gts[quesId] = self.vqa.qa[quesId]
             res[quesId] = self.vqaRes.qa[quesId]
@@ -100,9 +100,9 @@ class VQAEval:
         # =================================================
         # Compute accuracy
         # =================================================
-        accQA = []  # 总的准确率
-        accQuesType = {}  # 每种问题类型的准确率
-        accAnsType = {}  # 每种答案类别的准确率
+        accQA = []
+        accQuesType = {}
+        accAnsType = {}
 
         print("computing accuracy")
         step = 0
@@ -122,7 +122,7 @@ class VQAEval:
             gtAns = self.processPunctuation(gtAns)
             gtAns = self.processDigitArticle(gtAns)
 
-            # 比较 真实回答 和 预测回答
+
             gtAcc = 1 if gtAns == resAns else 0.0
 
             self.ansComp[quesId] = [gtAns, resAns]

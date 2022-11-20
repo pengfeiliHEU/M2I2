@@ -12,9 +12,7 @@ from vqaTools.vqaEval import *
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--quesFile', default='/mnt/sda/lpf/data/vqa/data_RAD/testset.json')
-    # parser.add_argument('--resFile', default='./output/rad/result/med_pretrain_29_vqa_result_<epoch>.json')
-    parser.add_argument('--resFile', default='./output/S-rad/result/med_pretrain_29_vqa_result_<epoch>.json')
-    # parser.add_argument('--resFile', default='./output/rad/result/_vqa_result_<epoch>.json')
+    parser.add_argument('--resFile', default='./output/rad/result/med_pretrain_29_vqa_result_<epoch>.json')
     args = parser.parse_args()
 
     all_result_list = []

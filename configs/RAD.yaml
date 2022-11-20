@@ -1,12 +1,13 @@
-train_file: ['/mnt/sda/lpf/data/vqa/data_RAD/trainset.json','/mnt/sda/lpf/data/vqa/data_RAD/testset.json']
+train_file: ['/mnt/sda/lpf/data/vqa/data_RAD/trainset.json',
+             '/mnt/sda/lpf/data/vqa/data_RAD/testset.json']
 
 test_file: ['/mnt/sda/lpf/data/vqa/data_RAD/testset.json']
-answer_list: '/mnt/sda/lpf/data/vqa/data_RAD/answer_list.json'  # 458个候选答案  train+test = 494
+answer_list: '/mnt/sda/lpf/data/vqa/data_RAD/answer_list.json'
 
-vqa_root: '/mnt/sda/lpf/data/vqa/data_RAD/images/'  # vqa_rad
+vqa_root: '/mnt/sda/lpf/data/vqa/data_RAD/images/'
 
-image_res: 384 # 384  256
-batch_size_train: 8  # 32
+image_res: 384
+batch_size_train: 8
 batch_size_test: 8
 k_test: 128
 

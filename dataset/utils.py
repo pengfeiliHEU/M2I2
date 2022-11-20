@@ -1,7 +1,16 @@
 import re
+from vqaTools.vqaEval import VQAEval
+from refTools.evaluation.refEvaluation import RefEvaluation
 
+import json
+import os
+import numpy as np
+import torch
+import torch.distributed as dist
+import torch.nn.functional as F
 
-# 预处理：去除question中的特殊字符，如果太长就进行裁剪
+import utils
+from tqdm import tqdm
 def pre_question(question, max_ques_words):
     question = re.sub(
         r"([,.'!?\"()*#:;~])",
@@ -39,21 +48,6 @@ def pre_caption(caption, max_words):
         caption = ' '.join(caption_words[:max_words])
 
     return caption
-
-
-from vqaTools.vqaEval import VQAEval
-from refTools.evaluation.refEvaluation import RefEvaluation
-
-import json
-import os
-import numpy as np
-import torch
-import torch.distributed as dist
-import torch.nn.functional as F
-
-import utils
-from tqdm import tqdm
-
 
 def vqa_eval(vqa, result_file, test_ques_path):
     vqaRes = vqa.loadRes(result_file, test_ques_path)

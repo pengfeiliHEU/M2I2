@@ -48,12 +48,9 @@ class M2I2(nn.Module):
             self.momentum = 0.995
 
     def forward(self, image, quesiton, answer=None, alpha=0, k=None, weights=None, train=True):
-        # 图像编码
+
         image_embeds = self.visual_encoder(image)
         image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(image.device)
-
-        # print("image_embeds.shape: ", image_embeds.shape)  # [8, 577, 768] 与输入图像的大小有关
-        # print("image_atts.shape: ", image_atts.shape)   # [8, 577]
 
         # train
         if train:
@@ -70,10 +67,7 @@ class M2I2(nn.Module):
                                                 return_dict=True)
 
             '''check point'''
-            # print("question_output.last_hidden_state.shape: ", question_output.last_hidden_state.shape)
-            # print("question_output.last_hidden_state: ", question_output.last_hidden_state)
 
-            # 将question_output进行重复，数量为对应answer的数量
             question_states = []
             question_atts = []
             for b, n in enumerate(k):
@@ -82,7 +76,6 @@ class M2I2(nn.Module):
             question_states = torch.stack(question_states, 0)
             question_atts = torch.stack(question_atts, 0)
 
-            # 动量蒸馏
             if self.distill:
                 with torch.no_grad():
                     self._momentum_update()
@@ -115,7 +108,6 @@ class M2I2(nn.Module):
                                                   alpha=alpha,
                                                   reduction='none',
                                                   )
-            # 不采用动量蒸馏
             else:
                 answer_output = self.text_decoder(answer.input_ids,
                                                   attention_mask=answer.attention_mask,
@@ -127,23 +119,6 @@ class M2I2(nn.Module):
                                                   )
             loss = weights * answer_output.loss
             loss = loss.sum() / image.size(0)
-
-            # 打印点
-            shifted_prediction_scores = answer_output.logits[:, :-1, :].contiguous()
-            labels = answer_targets[:, 1:].contiguous()
-
-            '''check point'''
-            # print("answer_targets.shape: ", answer_targets.shape)
-            # print("answer_targets: ", answer_targets)
-            # print("labels.shape: ", labels.shape)
-            # print("labels: ", labels)
-            # print("logits.shape: ", answer_output.logits.shape)
-            # print("logits: ", answer_output.logits)
-            # print("shifted_prediction_scores: ", shifted_prediction_scores)
-            # print("shifted_prediction_scores.shape: ", shifted_prediction_scores.shape)
-            # print("cl1: ", shifted_prediction_scores.view(-1, 30522))
-            # print("cl2: ", labels.view(-1))
-
             return loss
 
         # test

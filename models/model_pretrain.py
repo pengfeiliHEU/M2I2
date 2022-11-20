@@ -25,7 +25,6 @@ class M2I2(nn.Module):
         # vision encoder
         self.visual_encoder = mae_vit_base_patch16(img_size=config['image_res'], norm_pix_loss=False)
 
-        # 初始化MAE ViT
         if init_deit:
             # MAE
             checkpoint = torch.load(config['vit_mae_pretrain_path'], map_location='cpu')
@@ -75,14 +74,10 @@ class M2I2(nn.Module):
         with torch.no_grad():
             self.temp.clamp_(0.001, 0.5)
 
-        # 图像编码
         _, _, _, image_embeds = self.visual_encoder(image)
         image_atts = torch.ones(image_embeds.size()[:-1], dtype=torch.long).to(image.device)
         image_feat = F.normalize(self.vision_proj(image_embeds[:, 0, :]), dim=-1)
 
-        # print(image_embeds.shape)
-        # print(image_atts.shape)
-        # print(image_feat.shape)
 
         # text encoder
         text_output = self.text_encoder.bert(text.input_ids, attention_mask=text.attention_mask, return_dict=True,
@@ -93,7 +88,7 @@ class M2I2(nn.Module):
         # get momentum features
         with torch.no_grad():
             self._momentum_update()
-            # 编码
+
             _, _, _, image_embeds_m = self.visual_encoder_m(image)
             image_feat_m = F.normalize(self.vision_proj_m(image_embeds_m[:, 0, :]), dim=-1)
             image_feat_all = torch.cat([image_feat_m.t(), self.image_queue.clone().detach()], dim=1)
@@ -102,7 +97,7 @@ class M2I2(nn.Module):
             text_feat_m = F.normalize(self.text_proj_m(text_output_m.last_hidden_state[:, 0, :]), dim=-1)
             text_feat_all = torch.cat([text_feat_m.t(), self.text_queue.clone().detach()], dim=1)
 
-            # 计算相似度
+
             sim_i2t_m = image_feat_m @ text_feat_all / self.temp
             sim_t2i_m = text_feat_m @ image_feat_all / self.temp
 
@@ -112,7 +107,6 @@ class M2I2(nn.Module):
             sim_i2t_targets = alpha * F.softmax(sim_i2t_m, dim=1) + (1 - alpha) * sim_targets
             sim_t2i_targets = alpha * F.softmax(sim_t2i_m, dim=1) + (1 - alpha) * sim_targets
 
-        # @ -> 矩阵乘法，求相似度
         sim_i2t = image_feat @ text_feat_all / self.temp
         sim_t2i = text_feat @ image_feat_all / self.temp
 
@@ -231,8 +225,6 @@ class M2I2(nn.Module):
         else:
             image_feats = image_feat
             text_feats = text_feat
-        # image_feats = concat_all_gather(image_feat)
-        # text_feats = concat_all_gather(text_feat)
 
         batch_size = image_feats.shape[0]
 

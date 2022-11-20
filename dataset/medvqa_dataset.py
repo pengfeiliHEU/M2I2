@@ -1,16 +1,9 @@
 import os
 import re
 import json
-import random
-import argparse
 from PIL import Image
 from torch.utils.data import Dataset
-# from dataset.utils import pre_question
-# from pathlib import Path
-# from torchvision import transforms
-# import ruamel_yaml as yaml
-import yaml
-import _pickle as cPickle
+
 
 
 contractions = {
@@ -61,7 +54,7 @@ manual_map = {'none': '0',
               'nine': '9',
               'ten': '10'}
 articles = ['a', 'an', 'the']
-# re.compile 编译一个正则表达式模式，返回一个 Pattern 对象。
+
 period_strip = re.compile("(?!<=\d)(\.)(?!\d)")
 comma_strip = re.compile("(\d)(\,)(\d)")
 punct = [';', r"/", '[', ']', '"', '{', '}',
@@ -84,7 +77,6 @@ def get_score(occurences):
         return 1.
 
 
-# 处理标点符号，去除标点符号
 def process_punctuation(inText):
     outText = inText
     for p in punct:
@@ -96,10 +88,6 @@ def process_punctuation(inText):
     return outText
 
 
-# 1、将英文数字转成阿拉伯数字；
-# 2、转成小写；
-# 3、去掉a、an、the；
-# 4、将压缩的word替换成对应的形式，如dont -> don't
 def process_digit_article(inText):
     outText = []
     tempText = inText.lower().split()
@@ -116,14 +104,12 @@ def process_digit_article(inText):
     return outText
 
 
-# 多次替换
 def multiple_replace(text, wordDict):
     for key in wordDict:
         text = text.replace(key, wordDict[key])
     return text
 
 
-# answer的预处理
 def preprocess_answer(answer):
     answer = str(answer)
     answer = process_digit_article(process_punctuation(answer))
@@ -132,21 +118,21 @@ def preprocess_answer(answer):
 
 
 def pre_question(question: str, max_ques_words: int):
-    # 转成小写
+
     question = question.lower()
 
-    # 将question中无关提示字符去除
+
     if "? -yes/no" in question:
         question = question.replace("? -yes/no", "")
     if "? -open" in question:
         question = question.replace("? -open", "")
     if "? - open" in question:
         sentence = question.replace("? - open", "")
-    # 将一些符号去除
+
     question = question.replace(',', '').replace('?', '').replace('\'s',
                 ' \'s').replace('...', '').replace('x ray', 'x-ray').replace('.', '')
 
-    # 去除字符串右边的空格
+
     question = question.rstrip(' ')
     # truncate question
     question_words = question.split(' ')
@@ -172,9 +158,7 @@ class rad_dataset(Dataset):
         if split == 'test':
             self.max_ques_words = 50  # do not limit question length during test
             self.answer_list = json.load(open(answer_list, 'r'))
-            # self.answer_list = cPickle.load(open(answer_list, 'rb'))
-            # print(self.answer_list)
-            # print(len(self.answer_list))
+
 
 
     def __len__(self):
@@ -220,9 +204,6 @@ class pathvqa_dataset(Dataset):
         if split == 'test':
             self.max_ques_words = 50  # do not limit question length during test
             self.answer_list = json.load(open(answer_list, 'r'))
-            # self.answer_list = cPickle.load(open(answer_list, 'rb'))
-            # print(self.answer_list)
-            # print(len(self.answer_list))
 
 
     def __len__(self):

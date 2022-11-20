@@ -4,10 +4,17 @@ import os
 import time
 from collections import defaultdict, deque
 import datetime
-
+import random
+import torch.backends.cudnn as cudnn
 import torch
 import torch.distributed as dist
 
+# set random seed
+def set_seed(seed: int):
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    cudnn.benchmark = True
 
 class SmoothedValue(object):
     """Track a series of values and provide access to smoothed values over a

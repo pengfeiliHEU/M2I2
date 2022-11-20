@@ -3,8 +3,7 @@ train_file: ['/mnt/sda/lpf/data/vqa/data_PathVQA/pathvqa_train.json',
 
 test_file: ['/mnt/sda/lpf/data/vqa/data_PathVQA/pathvqa_test.json']
 
-answer_list: '/mnt/sda/lpf/data/vqa/data_PathVQA/answer_trainval_list.json'  # 4092候选答案
-#answer_list: '/mnt/sda/lpf/data/vqa/data_PathVQA/answer_all_list.json'      # 4946候选答案
+answer_list: '/mnt/sda/lpf/data/vqa/data_PathVQA/answer_trainval_list.json'
 
 
 vqa_root: '/mnt/sda/lpf/data/vqa/data_PathVQA/images/'  # PathVQA
@@ -24,10 +23,3 @@ bert_config: 'configs/config_bert.json'
 
 optimizer: {opt: adamW, lr: 2e-5, weight_decay: 0.02}
 schedular: {sched: cosine, lr: 2e-5, epochs: 40, min_lr: 1e-6, decay_rate: 1, warmup_lr: 1e-5, warmup_epochs: 4, cooldown_epochs: 0}
-
-
-
-
-
-
-

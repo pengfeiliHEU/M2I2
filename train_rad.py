@@ -5,19 +5,15 @@ import time
 import datetime
 import json
 from pathlib import Path
-
 import torch
 from models.model_vqa import M2I2
 from models.vit import interpolate_pos_embed
 from models.tokenization_bert import BertTokenizer
-
 import utils
 from dataset.utils import save_result
 from dataset import create_dataset, create_sampler, create_loader, vqa_collate_fn
-
 from scheduler import create_scheduler
 from optim import create_optimizer
-import tools.common_utils as common_utils
 
 
 def train(model, data_loader, optimizer, tokenizer, epoch, warmup_steps, device, scheduler, config):
@@ -36,7 +32,6 @@ def train(model, data_loader, optimizer, tokenizer, epoch, warmup_steps, device,
     for i, (image, question, answer, weights, n) in enumerate(metric_logger.log_every(data_loader, print_freq, header)):
         image, weights = image.to(device, non_blocking=True), weights.to(device, non_blocking=True)
 
-        # 按batch中最长的长度进行padding，最长不超过25
         question_input = tokenizer(question, padding='longest', truncation=True,
                                    max_length=25, return_tensors="pt").to(device)
         answer_input = tokenizer(answer, padding='longest', return_tensors="pt").to(device)
@@ -99,7 +94,7 @@ def main(args, config):
 
     # fix the seed for reproducibility
     seed = args.seed + utils.get_rank()
-    common_utils.set_seed(seed)
+    utils.set_seed(seed)
 
     start_epoch = 0
     max_epoch = config['schedular']['epochs']
@@ -202,12 +197,11 @@ def main(args, config):
 
             train_stats = train(model, train_loader, optimizer, tokenizer, epoch, warmup_steps, device, lr_scheduler,
                                 config)
-            # 验证
+
             torch.cuda.empty_cache()
             vqa_result = evaluation(model, test_loader, tokenizer, device, config)
             torch.cuda.empty_cache()
 
-        # 如果是test，则直接退出训练过程
         if args.evaluate:
             break
 
@@ -231,17 +225,7 @@ def main(args, config):
                 torch.save(save_obj, os.path.join(args.output_dir, '%s_rad_%02d.pth' % (prefix, epoch)))
 
             save_result(vqa_result, args.result_dir, '%s_vqa_result_%s' % (prefix, epoch))
-
-        # 同步所有进程。分布式训练时需要
         # dist.barrier()
-    # 清空显存缓存
-    torch.cuda.empty_cache()
-
-    # 保存过程loss
-    if utils.is_main_process():
-        with open(os.path.join(args.output_dir, "loss.json"), "w") as f:
-            f.write(json.dumps(loss_list))
-
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
     print('Training time {}'.format(total_time_str))
@@ -250,19 +234,11 @@ def main(args, config):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', default='./configs/RAD.yaml')
-    # parser.add_argument('--checkpoint', default='./pre_weights/med_pretrain/med_pretrain_29.pth')  # Best weight without mim
-    # parser.add_argument('--checkpoint', default='./pre_weights/mim_pre_med/med_pretrain_29.pth')  # 加入了mim
-    # parser.add_argument('--checkpoint', default='./pretrain/noitc/med_pretrain_29.pth')  # 消融实验-去掉ITC
-    # parser.add_argument('--checkpoint', default='./pretrain/nomim/med_pretrain_29.pth')  # 消融实验-去掉MIM
-    # parser.add_argument('--checkpoint', default='pre_weights/pretrain/ALBEF_4M.pth')   # ALBEF 预训练权重
-    parser.add_argument('--checkpoint', default='')   # 不加载权重
-    # parser.add_argument('--checkpoint', default='./pretrain/2022-10-21/med_pretrain_29.pth')
+    parser.add_argument('--checkpoint', default='./pretrain/2022-09-11/med_pretrain_29.pth')
     parser.add_argument('--output_dir', default='output/rad')
     parser.add_argument('--evaluate', action='store_true')
     parser.add_argument('--text_encoder', default='bert-base-uncased')
-    # parser.add_argument('--text_encoder', default='microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext')
     parser.add_argument('--text_decoder', default='bert-base-uncased')
-    # parser.add_argument('--text_decoder', default='microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext')
     parser.add_argument('--device', default='cuda')
     parser.add_argument('--seed', default=42, type=int)
     parser.add_argument('--world_size', default=1, type=int, help='number of distributed processes')
@@ -270,9 +246,7 @@ if __name__ == '__main__':
     parser.add_argument('--distributed', default=False, type=bool)
     args = parser.parse_args()
 
-    # YAML Resolver被设置为匹配浮点数，不能自动匹配JSON规范的浮点数，如1e-5。需要传入自定义的loader
     config = yaml.load(open(args.config, 'r'), Loader=yaml.Loader)
-    # config = yaml.load(open(args.config, 'r'))
 
     args.result_dir = os.path.join(args.output_dir, 'result')
 

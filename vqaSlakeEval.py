@@ -12,22 +12,20 @@ from vqaTools.vqaEval import *
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--quesFile', default='/mnt/sda/lpf/data/vqa/data_Slake/en/slake_test.json')
-    parser.add_argument('--resFile', default='./output/D-slake/result/med_pretrain_29_vqa_result_<epoch>.json')
-    # parser.add_argument('--resFile', default='./output/slake/result/_vqa_result_<epoch>.json')
+    parser.add_argument('--resFile', default='./output/slake/result/med_pretrain_29_vqa_result_<epoch>.json')
     args = parser.parse_args()
 
     all_result_list = []
 
     quesFile = args.quesFile
-    vqa = VQA(quesFile, quesFile)  # question 和 answer 和 imgToQA
+    vqa = VQA(quesFile, quesFile)  # question, answer and imgToQA
 
     for i in range(40):
         resFile = args.resFile.replace('<epoch>', str(i))
         print(resFile)
 
         # create vqa object and vqaRes object
-        # 两个都是VQA对象实例，数据处理够保存在imgToQA、qa和qqa成员变量中
-        vqaRes = vqa.loadRes(resFile, quesFile)  # question 和 predict answer 和 imgToQA
+        vqaRes = vqa.loadRes(resFile, quesFile)
 
         # create vqaEval object by taking vqa and vqaRes
         vqaEval = VQAEval(vqa, vqaRes, n=2)  # n is precision of accuracy (number of places after decimal), default is 2
