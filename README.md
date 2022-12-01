@@ -102,6 +102,15 @@ python3 vqaSlakeEval.py --quesFile ./data_Slake/slake_test.json --resFile ./outp
 ### Slake dataset
 <img src="fig/table_3.png">
 
+## Citation:
+```
+@article{M2I2,
+  title     = {Self-supervised vision-language pretraining for Medical visual question answering},
+  author    = {Pengfei Li, Gang Liu, Lin Tan, Jinying Liao and Shenjun Zhong},
+  journal   = {arXiv preprint arXiv.2211.13594},
+  year      = {2022}
+}
+```
 
 ## License
 MIT License
