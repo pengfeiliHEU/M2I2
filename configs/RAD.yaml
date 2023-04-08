@@ -1,5 +1,4 @@
-train_file: ['/mnt/sda/lpf/data/vqa/data_RAD/trainset.json',
-             '/mnt/sda/lpf/data/vqa/data_RAD/testset.json']
+train_file: ['/mnt/sda/lpf/data/vqa/data_RAD/trainset.json']
 
 test_file: ['/mnt/sda/lpf/data/vqa/data_RAD/testset.json']
 answer_list: '/mnt/sda/lpf/data/vqa/data_RAD/answer_list.json'
